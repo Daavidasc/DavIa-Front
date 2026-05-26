@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Query</title>
+</head>
+<body>
+
+    <textarea id="promptInput" rows="4" cols="50" placeholder="Escribe tu consulta aquí..."></textarea>
+    <br><br>
+    <button onclick="enviarConsulta()">Consultar Agente</button>
+
+    <hr>
+
+    <div id="resultado">Las respuestas aparecerán aquí...</div>
+
+    <script>
+        async function enviarConsulta() {
+            const promptText = document.getElementById('promptInput').value;
+            const resultadoDiv = document.getElementById('resultado');
+            
+            if (!promptText.trim()) {
+                alert("Por favor escribe algo.");
+                return;
+            }
+
+            resultadoDiv.innerText = "Pensando...";
+
+            try {
+                // Conexión al backend de Python
+                const response = await fetch('http://127.0.0.1:8000/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: promptText })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Muestra la respuesta en texto plano puro
+                    resultadoDiv.innerText = data.response;
+                } else {
+                    resultadoDiv.innerText = "Error: " + data.detail;
+                }
+            } catch (error) {
+                resultadoDiv.innerText = "Error de conexión: " + error.message;
+            }
+        }
+    </script>
+
+</body>
+</html>
