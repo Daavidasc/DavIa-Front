@@ -15,8 +15,34 @@
     <div id="resultado">Las respuestas aparecerán aquí...</div>
 
     <script>
-        async function enviarConsulta() {
-            const promptText = document.getElementById('promptInput').value;
+        // FUNCIÓN AUTOMÁTICA: Se ejecuta apenas carga la página
+window.onload = function() {
+    // 1. Tomamos la ruta de la URL (ejemplo: "/que%20es%20polimorfismo")
+    const pathname = window.location.pathname; 
+
+    // 2. Filtramos que no sea la página raíz vacía
+    if (pathname && pathname !== "/") {
+        
+        // 3. Limpiamos la ruta: 
+        // substring(1) quita la barra "/" del inicio
+        // decodeURIComponent limpia los espacios (%20) y caracteres raros
+        // .replace(/\+/g, ' ') por si acaso quedara algún "+" rezagado
+        const consultaRuta = decodeURIComponent(pathname.substring(1)).replace(/\+/g, ' ');
+
+            if (consultaRuta.trim()) {
+                // 4. DISCRECIÓN ABSOLUTA: Borramos la pregunta de la URL en un milisegundo
+                // El enlace vuelve a quedar limpio como "tuservidor.render/"
+                window.history.replaceState({}, document.title, "/");
+
+                // 5. Inyectamos la pregunta en el cuadro y disparamos la consulta a Python
+                document.getElementById('promptInput').value = consultaRuta;
+                enviarConsulta();
+            }
+        }
+       };
+        async function enviarConsulta(consulta) {
+            const inputElement = document.getElementById('promptInput');
+            const promptText = inputElement.value;
             const resultadoDiv = document.getElementById('resultado');
             
             if (!promptText.trim()) {
@@ -24,10 +50,11 @@
                 return;
             }
 
+            // Limpiamos el input por si alguien mira la pantalla mientras carga
+            inputElement.value = "";
             resultadoDiv.innerText = "Pensando...";
 
             try {
-                // Conexión al backend de Python
                 const response = await fetch('http://127.0.0.1:8000/ask', {
                     method: 'POST',
                     headers: {
@@ -39,7 +66,6 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Muestra la respuesta en texto plano puro
                     resultadoDiv.innerText = data.response;
                 } else {
                     resultadoDiv.innerText = "Error: " + data.detail;
