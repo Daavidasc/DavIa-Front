@@ -28,7 +28,7 @@
         async function enviarConsulta(consulta) {
 
             const resultadoDiv = document.getElementById('resultado');
-            resultadoDiv.innerText = "Pensando...";
+            resultadoDiv.innerText = "Redireccionando...";
             try {
                 const response = await fetch('https://davia-back-production.up.railway.app/ask', {
                     method: 'POST',
