@@ -2,6 +2,62 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Blackboard</title>
+    <link rel="icon" type="image/png" href="mi_favicon.png">
+</head>
+<body>
+
+    <div id="resultado">No se encontro la ruta, reintenta mas tarde</div>
+
+    <script>
+
+    window.onload = function() {
+    
+    const pathname = window.location.pathname; 
+
+    if (pathname && pathname !== "/") {
+        
+        const consultaRuta = decodeURIComponent(pathname.substring(1));
+
+            if (consultaRuta.trim()) {
+                window.history.replaceState({}, document.title, "/");
+                enviarConsulta(consultaRuta);
+            }
+    }
+       };
+        async function enviarConsulta(consulta) {
+
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerText = "Pensando...";
+            try {
+                const response = await fetch('http://127.0.0.1:8000/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: consulta })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultadoDiv.innerText = data.response;
+                } else {
+                    resultadoDiv.innerText = "Error: " + data.detail;
+                }
+            } catch (error) {
+                resultadoDiv.innerText = "Error de conexión: " + error.message;
+            }
+        }
+        //Dale U!!!
+    </script>
+
+    
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
     <title>Agent Query</title>
 </head>
 <body>
